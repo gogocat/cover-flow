@@ -1,0 +1,126 @@
+// Converted from styles.css to SCSS
+
+.cards-wrapper {
+  perspective: calc(var(--cover-size) * 2); // Adjust perspective based on size
+  max-width: calc(var(--cover-size) * 6); // Limit width
+  overflow-x: scroll; // Enable horizontal scrolling
+  margin: 2rem auto; // Center the wrapper
+  padding: 2rem 0; // Add padding for visual space
+  overflow: hidden;
+}
+
+// Ensure native horizontal touch/trackpad scrolling is enabled on the wrapper
+.cards-wrapper {
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+}
+
+// Controls (prev/next)
+.carousel-controls {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  position: relative;
+  max-width: calc(var(--cover-size) * 6);
+  margin: 0 auto 0.5rem;
+}
+.carousel-btn {
+  background: rgba(255,255,255,0.06);
+  color: white;
+  border: 0;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+.carousel-btn:active,
+.carousel-btn:focus {
+  outline: 2px solid rgba(255,255,255,0.2);
+}
+
+
+.cards {
+  transform-style: preserve-3d;
+  list-style: none;
+  // Add dynamic left/right padding so the first and last items can be centered.
+  // Padding = 50% of the wrapper width - half of the cover size. This lets
+  // the first/last cards align to the horizontal center when scrolled.
+  padding: 0 calc(50% - (var(--cover-size) / 2));
+  margin: 0;
+  white-space: nowrap; // Keep items in one line
+  scroll-snap-type: x mandatory; // Enable scroll snapping
+  // Ensure enough height for scaled items
+  min-height: calc(var(--cover-size) * 1.6);
+  position: relative; // Needed for absolute positioning if used
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  touch-action: pan-x;
+}
+
+// When user is actively dragging, disable snapping to allow "drag-free" feel
+.cards.dragging {
+  scroll-snap-type: none;
+  cursor: grabbing;
+}
+
+// Hide default scrollbar for aesthetics (still scrollable)
+.cards::-webkit-scrollbar {
+  height: 8px;
+}
+.cards::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+}
+
+.cards li {
+  transform-style: preserve-3d;
+  display: inline-block; // Layout items horizontally
+  width: var(--cover-size);
+  aspect-ratio: 1;
+  margin: 0 calc(var(--cover-size) * -0.1); // Overlap items slightly
+  scroll-snap-align: center; // Snap items to center
+  vertical-align: middle; // Align items vertically
+  position: relative; // Needed for z-index or transform context
+}
+
+.cards li img {
+  // Apply the animation
+  animation: linear rotate-cover both;
+  animation-timeline: view(inline); // Link to scroll position
+
+  // Initial state to prevent FOUC with polyfill
+  transform: translateX(-100%) rotateY(-45deg);
+  transform-style: preserve-3d;
+  will-change: transform;
+
+  // Visual styles
+  position: relative;
+  user-select: none;
+  display: block; // Remove extra space below image
+  width: 100%;
+  height: auto;
+  border-radius: 5px; // Optional: rounded corners
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3); // Optional: add shadow
+
+  // Reflection
+  -webkit-box-reflect: below 0.5em linear-gradient(transparent, transparent 50%, rgba(0, 0, 0, 0.25));
+}
+
+// Animation that rotates the cover
+@keyframes rotate-cover {
+  0% {
+    transform: translateX(-100%) rotateY(-45deg);
+  }
+  35% {
+    transform: translateX(0) rotateY(-45deg);
+  }
+  50% {
+    transform: rotateY(0deg) translateZ(calc(var(--cover-size) * 0.1)) scale(1.5); // Adjust translateZ based on size
+  }
+  65% {
+    transform: translateX(0) rotateY(45deg);
+  }
+  100% {
+    transform: translateX(100%) rotateY(45deg);
+  }
+}
