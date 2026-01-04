@@ -57,10 +57,13 @@
   touch-action: pan-x;
 }
 
+
+
 // When user is actively dragging, disable snapping to allow "drag-free" feel
 .cards.dragging {
   scroll-snap-type: none;
   cursor: grabbing;
+  scroll-behavior: auto;
 }
 
 // Hide default scrollbar for aesthetics (still scrollable)
