@@ -6,7 +6,12 @@
   overflow-x: scroll; // Enable horizontal scrolling
   margin: 2rem auto; // Center the wrapper
   padding: 2rem 0; // Add padding for visual space
-  overflow: hidden;
+  
+  // Hide scrollbar but keep scroll functionality for SDA
+  scrollbar-width: none; // Firefox
+  &::-webkit-scrollbar { 
+    display: none; // Safari/Chrome
+  }
 }
 
 // Ensure native horizontal touch/trackpad scrolling is enabled on the wrapper
@@ -67,13 +72,7 @@
 }
 
 // Hide default scrollbar for aesthetics (still scrollable)
-.cards::-webkit-scrollbar {
-  height: 8px;
-}
-.cards::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.08);
-  border-radius: 4px;
-}
+// Hide default scrollbar for aesthetics (still scrollable)
 
 .cards li {
   transform-style: preserve-3d;
