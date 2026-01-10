@@ -79,7 +79,7 @@
   display: inline-block; // Layout items horizontally
   width: var(--cover-size);
   aspect-ratio: 1;
-  margin: 0 calc(var(--cover-size) * -0.1); // Overlap items slightly
+  margin: 0 calc(var(--cover-size) * (var(--overlap-factor) - 1) / 2); // Overlap items dynamically
   scroll-snap-align: center; // Snap items to center
   vertical-align: middle; // Align items vertically
   position: relative; // Needed for z-index or transform context

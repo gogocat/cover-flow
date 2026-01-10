@@ -13,13 +13,14 @@ A premium, interactive Coverflow component built with React, TypeScript, and SCS
 ## Installation
 
 ```bash
-npm install
+npm install cover-flow
 ```
 
 ## Usage
 
 ```tsx
-import Coverflow from './Coverflow';
+import Coverflow from 'cover-flow';
+import 'cover-flow/style.css'; // Don't forget to import the styles!
 
 const albums = [
     { 
@@ -53,6 +54,9 @@ function App() {
 | `initCenter` | `boolean` | `false` | If true, scrolls to the middle item on mount. |
 | `onItemClick` | `(item) => void`| `() => {}`| Called when an item is selected (via click, drag snap, or button). |
 | `className` | `string` | `''` | Additional CSS class for the wrapper. |
+| `leftIcon` | `ReactNode` | `'←'` | Custom icon for the "Previous" button. |
+| `rightIcon` | `ReactNode` | `'→'` | Custom icon for the "Next" button. |
+| `overlapFactor`| `number` | `0.8` | Determines item spacing/overlap (0 to 1). |
 
 ### AlbumItem Interface
 
@@ -69,7 +73,7 @@ interface AlbumItem {
 
 ### 1. Layout & Styling (`styles.scss`)
 The component achieves its characteristic "stacked" look using **negative margins**. 
-- Each item has a negative right margin (controlled via `OVERLAP_FACTOR` of `0.8`), which pulls the next item on top of the current one.
+- Each item has a negative right margin (controlled via the `overlapFactor` prop, default `0.8`), which pulls the next item on top of the current one.
 - Side padding is dynamically calculated in a `useEffect` to ensure that when an item is selected, it appears centered in the container.
 
 ### 2. Custom Smooth Scrolling
@@ -93,3 +97,8 @@ The component's navigation logic is centralized in two helper functions:
 - **Linting**: `npm run lint` (uses ESLint with TypeScript support).
 - **Testing**: `npm test` (uses Vitest with DOM testing library).
 - **Building**: `npm run build` (runs lint, tests with coverage, and builds for production).
+
+## Acknowledgements
+
+This project was inspired by [Addy Osmani's blog post on Coverflow](https://addyosmani.com/blog/coverflow/).
+

@@ -21,6 +21,9 @@ interface CoverflowProps {
   imgHeight?: number;
   onItemClick?: (item: AlbumItem) => void;
   initCenter?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  overlapFactor?: number;
 }
 
 interface DragState {
@@ -34,7 +37,6 @@ interface DragState {
 }
 
 // --- Constants & Helpers ---
-const OVERLAP_FACTOR = 0.8;
 const DRAG_THRESHOLD = 10;
 const MOMENTUM_MULTIPLIER = 200;
 
@@ -52,6 +54,9 @@ function Coverflow(props: CoverflowProps) {
         imgHeight = 200, 
         onItemClick = ()=>{},
         initCenter = false,
+        leftIcon = '←',
+        rightIcon = '→',
+        overlapFactor = 0.8,
     } = props;
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -78,7 +83,7 @@ function Coverflow(props: CoverflowProps) {
             cardsRef.current.style.paddingRight = '0px'; 
       
             // Calculate explicit width to force scrollability
-            const itemStep = imgWidth * OVERLAP_FACTOR;
+            const itemStep = imgWidth * overlapFactor;
             const totalWidth = items.length * itemStep;
             const buffer = imgWidth * 3; // Safety buffer
       
@@ -87,7 +92,7 @@ function Coverflow(props: CoverflowProps) {
 
         if (containerRef.current && items.length > 0) {
             let startIndex = 0;
-            const step = imgWidth * OVERLAP_FACTOR;
+            const step = imgWidth * overlapFactor;
             
             if (initCenter) {
                 startIndex = Math.floor(items.length / 2);
@@ -96,7 +101,7 @@ function Coverflow(props: CoverflowProps) {
             
             onItemClick(items[startIndex]);
         }
-    }, [imgWidth, items, initCenter, onItemClick]);
+    }, [imgWidth, items, initCenter, onItemClick, overlapFactor]);
 
     const stopActiveScroll = () => {
         if (scrollRafRef.current) {
@@ -133,7 +138,7 @@ function Coverflow(props: CoverflowProps) {
         scrollRafRef.current = requestAnimationFrame(animateScroll);
     };
 
-    const scrollStep = imgWidth * OVERLAP_FACTOR;
+    const scrollStep = imgWidth * overlapFactor;
 
     const getCurrentIndex = () => {
         if (!containerRef.current) {
@@ -283,7 +288,10 @@ function Coverflow(props: CoverflowProps) {
             <div
                 className={`cards-wrapper ${className}`.trim()}
                 ref={containerRef}
-                style={{ '--cover-size': `${imgWidth}px` } as React.CSSProperties}
+                style={{ 
+                    '--cover-size': `${imgWidth}px`,
+                    '--overlap-factor': overlapFactor 
+                } as React.CSSProperties}
                 tabIndex={0}
                 onKeyDown={onKeyDown}
                 onPointerDown={onPointerDown}
@@ -309,9 +317,12 @@ function Coverflow(props: CoverflowProps) {
                     ))}
                 </ul>
             </div>
-            <div className="carousel-controls" style={{ '--cover-size': `${imgWidth}px` } as React.CSSProperties}>
-                <button aria-label="Previous" className="carousel-btn prev" onClick={scrollPrev}>←</button>
-                <button aria-label="Next" className="carousel-btn next" onClick={scrollNext}>→</button>
+            <div className="carousel-controls" style={{ 
+                '--cover-size': `${imgWidth}px`,
+                '--overlap-factor': overlapFactor 
+            } as React.CSSProperties}>
+                <button aria-label="Previous" className="carousel-btn prev" onClick={scrollPrev}>{leftIcon}</button>
+                <button aria-label="Next" className="carousel-btn next" onClick={scrollNext}>{rightIcon}</button>
             </div>
         </div>
     );
