@@ -10,9 +10,11 @@ export interface AlbumItem {
 }
 
 interface CoverflowProps {
+  className?: string;
   items: AlbumItem[];
   imgWidth?: number;
   imgHeight?: number;
+  onItemClick?: (item: AlbumItem) => void;
 }
 
 interface DragState {
@@ -36,7 +38,15 @@ const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
 
 type EasingFunction = (t: number) => number;
 
-function Coverflow({ items = [], imgWidth = 200, imgHeight = 200 }: CoverflowProps) {
+function Coverflow(props: CoverflowProps) {
+    const {
+        className = '',
+        items = [], 
+        imgWidth = 200, 
+        imgHeight = 200, 
+        onItemClick = ()=>{},
+    } = props;
+
   const containerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLUListElement>(null);
   
@@ -127,6 +137,8 @@ function Coverflow({ items = [], imgWidth = 200, imgHeight = 200 }: CoverflowPro
     
     // "Simple easeIn" per user request: t^2
     smoothScrollTo(targetScroll, 600, easeInQuad);
+    // callback on item click
+    onItemClick(items[index]);
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -226,9 +238,9 @@ function Coverflow({ items = [], imgWidth = 200, imgHeight = 200 }: CoverflowPro
   };
 
   return (
-    <div>
+    <div data-testid="coverflow">
       <div
-        className="cards-wrapper"
+        className={`cards-wrapper ${className}`.trim()}
         ref={containerRef}
         style={{ '--cover-size': `${imgWidth}px` } as React.CSSProperties}
         tabIndex={0}
