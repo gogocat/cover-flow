@@ -1,29 +1,56 @@
 {
   "name": "cover-flow",
-  "private": true,
+  "private": false,
+  "description": "A premium, interactive Coverflow component for React",
   "version": "1.0.0",
   "type": "module",
+  "main": "./dist/cover-flow.umd.cjs",
+  "module": "./dist/cover-flow.js",
+  "types": "./dist/Coverflow.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/Coverflow.d.ts",
+      "import": "./dist/cover-flow.js",
+      "require": "./dist/cover-flow.umd.cjs"
+    },
+    "./style.css": "./dist/cover-flow.css"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "lint": "tsc --noEmit && eslint . --fix",
+    "preview": "vite preview",
+    "test": "vitest",
+    "build": "npm run lint && npm run test -- run --coverage && vite build"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "prop-types": "^15.8.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "scroll-timeline-polyfill": "^1.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^4.0.16",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
+    "jsdom": "^27.4.0",
+    "sass": "^1.72.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.52.0",
     "vite": "^6.2.0",
-    "sass": "^1.72.0"
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.0.16"
   }
 }

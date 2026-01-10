@@ -5,8 +5,13 @@
   max-width: calc(var(--cover-size) * 6); // Limit width
   overflow-x: scroll; // Enable horizontal scrolling
   margin: 2rem auto; // Center the wrapper
-  padding: 2rem 0; // Add padding for visual space
-  overflow: hidden;
+  padding: 4rem 0; // Add padding for visual space
+  
+  // Hide scrollbar but keep scroll functionality for SDA
+  scrollbar-width: none; // Firefox
+  &::-webkit-scrollbar { 
+    display: none; // Safari/Chrome
+  }
 }
 
 // Ensure native horizontal touch/trackpad scrolling is enabled on the wrapper
@@ -57,27 +62,24 @@
   touch-action: pan-x;
 }
 
+
+
 // When user is actively dragging, disable snapping to allow "drag-free" feel
 .cards.dragging {
   scroll-snap-type: none;
   cursor: grabbing;
+  scroll-behavior: auto;
 }
 
 // Hide default scrollbar for aesthetics (still scrollable)
-.cards::-webkit-scrollbar {
-  height: 8px;
-}
-.cards::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.08);
-  border-radius: 4px;
-}
+// Hide default scrollbar for aesthetics (still scrollable)
 
 .cards li {
   transform-style: preserve-3d;
   display: inline-block; // Layout items horizontally
   width: var(--cover-size);
   aspect-ratio: 1;
-  margin: 0 calc(var(--cover-size) * -0.1); // Overlap items slightly
+  margin: 0 calc(var(--cover-size) * (var(--overlap-factor) - 1) / 2); // Overlap items dynamically
   scroll-snap-align: center; // Snap items to center
   vertical-align: middle; // Align items vertically
   position: relative; // Needed for z-index or transform context
