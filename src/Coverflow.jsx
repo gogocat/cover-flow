@@ -1,32 +1,13 @@
 import { useRef, useEffect } from 'react';
 import './styles.scss';
 
-// Helper for smooth scrolling with duration control
-const smoothScrollTo = (element, target, duration = 600) => {
-  const start = element.scrollLeft;
-  const change = target - start;
-  const startTime = performance.now();
-  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
-  const animateScroll = (currentTime) => {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const ease = easeOutCubic(progress);
-    
-    element.scrollLeft = start + (change * ease);
-
-    if (elapsed < duration) {
-      requestAnimationFrame(animateScroll);
-    }
-  };
-
-  requestAnimationFrame(animateScroll);
-};
 
 function Coverflow({ items = [], imgWidth = 200, imgHeight = 200 }) {
   const containerRef = useRef(null);
   const cardsRef = useRef(null);
   const dragRef = useRef({ isDown: false, startX: 0, scrollLeft: 0 });
+  const scrollRafRef = useRef(null);
 
   // Add buffer to ensure last items are reachable despite negative margins
   useEffect(() => {
@@ -47,6 +28,40 @@ function Coverflow({ items = [], imgWidth = 200, imgHeight = 200 }) {
     }
   }, [imgWidth, items.length]);
 
+  const stopActiveScroll = () => {
+    if (scrollRafRef.current) {
+      cancelAnimationFrame(scrollRafRef.current);
+      scrollRafRef.current = null;
+    }
+  };
+
+  const smoothScrollTo = (element, target, duration = 600, easingFn) => {
+    stopActiveScroll();
+    const start = element.scrollLeft;
+    const change = target - start;
+    const startTime = performance.now();
+    
+    // Default to easeOutCubic for natural momentum/snap
+    const defaultEase = (t) => 1 - Math.pow(1 - t, 3);
+    const ease = easingFn || defaultEase;
+
+    const animateScroll = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = ease(progress);
+      
+      element.scrollLeft = start + (change * easedProgress);
+
+      if (elapsed < duration) {
+        scrollRafRef.current = requestAnimationFrame(animateScroll);
+      } else {
+        scrollRafRef.current = null;
+      }
+    };
+
+    scrollRafRef.current = requestAnimationFrame(animateScroll);
+  };
+
   const scrollNext = () => {
     if (containerRef.current) {
         const current = containerRef.current.scrollLeft;
@@ -61,13 +76,19 @@ function Coverflow({ items = [], imgWidth = 200, imgHeight = 200 }) {
     }
   };
 
-  const handleCardClick = (e) => {
+  const handleCardClick = (index) => {
+    console.log('handleCardClick: ', index);
     if (dragRef.current.hasMoved) return; 
+
+    // Calculate target position based on index and overlap factor (0.8)
+    // Matches the logic used in onPointerUp snap calculation
+    const step = imgWidth * 0.8;
+    const targetScroll = index * step;
     
-    // We can't use scrollIntoView if we want custom speed control easily without polyfills, 
-    // but scrollIntoView is precise. Let's stick to scrollIntoView for clicks as it's reliable implementation-wise.
-    // Or we can calculate position... let's stick to native for click as it's not the "fling".
-    e.currentTarget.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    // "Simple easeIn" per user request: t^2
+    const easeInQuad = (t) => t * t;
+
+    smoothScrollTo(containerRef.current, targetScroll, 600, easeInQuad);
   };
 
   const onKeyDown = (e) => {
@@ -77,6 +98,7 @@ function Coverflow({ items = [], imgWidth = 200, imgHeight = 200 }) {
 
   // Pointer Events for Dragging
   const onPointerDown = (e) => {
+    stopActiveScroll();
     dragRef.current.isDown = true;
     dragRef.current.startX = e.pageX;
     dragRef.current.scrollLeft = containerRef.current.scrollLeft;
@@ -106,7 +128,7 @@ function Coverflow({ items = [], imgWidth = 200, imgHeight = 200 }) {
     }
 
     const totalDx = x - dragRef.current.startX;
-    if (Math.abs(totalDx) > 5) dragRef.current.hasMoved = true;
+    if (Math.abs(totalDx) > 10) dragRef.current.hasMoved = true;
     
     containerRef.current.scrollLeft = dragRef.current.scrollLeft - totalDx;
   };
@@ -117,6 +139,22 @@ function Coverflow({ items = [], imgWidth = 200, imgHeight = 200 }) {
     containerRef.current.classList.remove('dragging');
     containerRef.current.releasePointerCapture(e.pointerId);
 
+    if (!dragRef.current.hasMoved) {
+      // Handle Click Simulation here since PointerCapture might swallow onClick
+      // Because of setPointerCapture, e.target is the container, not the element under cursor
+      const actualTarget = document.elementFromPoint(e.clientX, e.clientY);
+      const card = actualTarget?.closest('.card');
+      
+      if (card) {
+        const index = parseInt(card.dataset.index, 10);
+        if (!isNaN(index)) {
+           handleCardClick(index);
+           return;
+        }
+      }
+      return;
+    }
+
     const { velocity } = dragRef.current;
     
     // Default to nearest snap if no momentum
@@ -125,15 +163,13 @@ function Coverflow({ items = [], imgWidth = 200, imgHeight = 200 }) {
 
     if (Math.abs(velocity) > 0.1) {
        // Momentum logic
-       const momentumMultiplier = 200; // Increased for longer throw
+       const momentumMultiplier = 200; 
        const projected = containerRef.current.scrollLeft - (velocity * momentumMultiplier);
        
        const step = imgWidth * 0.8; 
        target = Math.round(projected / step) * step;
        
-       // Calculate duration based on distance to feel natural (fixed speed-ish)
        const distance = Math.abs(target - containerRef.current.scrollLeft);
-       // Slower: 1.5ms per pixel, min 800ms, max 1500ms
        duration = Math.min(1500, Math.max(800, distance * 1.5));
     } else {
        // Snap to nearest if just dropped
@@ -162,7 +198,7 @@ function Coverflow({ items = [], imgWidth = 200, imgHeight = 200 }) {
             <li
               key={album.position || index}
               className="card"
-              onClick={handleCardClick}
+              data-index={index}
             >
               <img
                 draggable={false}
