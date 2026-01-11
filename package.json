@@ -1,9 +1,17 @@
 {
-  "name": "cover-flow",
+  "name": "@gogocat/cover-flow",
   "private": false,
   "description": "A premium, interactive Coverflow component for React",
   "version": "1.0.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gogocat/cover-flow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gogocat/cover-flow/issues"
+  },
+  "homepage": "https://github.com/gogocat/cover-flow#readme",
   "main": "./dist/cover-flow.umd.cjs",
   "module": "./dist/cover-flow.js",
   "types": "./dist/Coverflow.d.ts",

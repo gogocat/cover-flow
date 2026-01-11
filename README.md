@@ -13,14 +13,14 @@ A premium, interactive Coverflow component built with React, TypeScript, and SCS
 ## Installation
 
 ```bash
-npm install cover-flow
+npm install @gogocat/cover-flow
 ```
 
 ## Usage
 
 ```tsx
-import Coverflow from 'cover-flow';
-import 'cover-flow/style.css'; // Don't forget to import the styles!
+import Coverflow from '@gogocat/cover-flow';
+import '@gogocat/cover-flow/style.css'; // Don't forget to import the styles!
 
 const albums = [
     { 
@@ -64,8 +64,7 @@ function App() {
 interface AlbumItem {
     image_url: string;
     title: string;
-    artists: string;
-    position?: number;
+    artists?: string;
 }
 ```
 
