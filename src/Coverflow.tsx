@@ -10,8 +10,7 @@ import './styles.scss';
 export interface AlbumItem {
   image_url: string;
   title: string;
-  artists: string;
-  position?: number;
+  artists?: string;
 }
 
 interface CoverflowProps {
@@ -302,7 +301,7 @@ function Coverflow(props: CoverflowProps) {
                 <ul className="cards" ref={cardsRef}>
                     {items.map((album, index) => (
                         <li
-                            key={album.position || index}
+                            key={index}
                             className="card"
                             data-index={index}
                         >
